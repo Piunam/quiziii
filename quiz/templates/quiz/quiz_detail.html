@@ -1,0 +1,215 @@
+{% extends 'quiz/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Quiz Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title h2 text-primary">{{ quiz.title }}</h1>
+                    <p class="card-text lead">{{ quiz.description }}</p>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Total Questions: {{ questions|length }}</span>
+                        <span class="badge bg-primary">Quiz Time: 30 minutes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Form -->
+    <form method="post" id="quizForm">
+        {% csrf_token %}
+        
+        {% for question in questions %}
+        <div class="card mb-4 question-card" id="question-{{ forloop.counter }}">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    Question {{ forloop.counter }}: {{ question.text }}
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for choice in question.choice_set.all %}
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" 
+                           name="question_{{ question.id }}" 
+                           id="choice_{{ choice.id }}" 
+                           value="{{ choice.id }}"
+                           required>
+                    <label class="form-check-label" for="choice_{{ choice.id }}">
+                        {{ choice.text }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted">Select one answer</small>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Navigation Buttons -->
+        <div class="d-flex justify-content-between mb-4">
+            <button type="button" class="btn btn-secondary" id="prevBtn" onclick="showPreviousQuestion()">Previous</button>
+            <div class="progress w-50 my-2">
+                <div class="progress-bar" role="progressbar" style="width: 0%;" id="progressBar">0%</div>
+            </div>
+            <button type="button" class="btn btn-primary" id="nextBtn" onclick="showNextQuestion()">Next</button>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success btn-lg" id="submitBtn">
+                Submit Quiz
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Add this JavaScript to your quiz_detail.html -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize variables
+        const questions = document.querySelectorAll('.question-card');
+        let currentQuestion = 0;
+        updateNavigation();
+
+        // Hide all questions except the first one
+        questions.forEach((question, index) => {
+            if (index !== 0) {
+                question.style.display = 'none';
+            }
+        });
+
+        // Update progress bar
+        updateProgress();
+    });
+
+    function showNextQuestion() {
+        const questions = document.querySelectorAll('.question-card');
+        const currentQuestionEl = questions[currentQuestion];
+        
+        // Check if current question is answered
+        const radios = currentQuestionEl.querySelectorAll('input[type="radio"]');
+        const isAnswered = Array.from(radios).some(radio => radio.checked);
+        
+        if (!isAnswered) {
+            alert('Please answer the current question before proceeding.');
+            return;
+        }
+
+        if (currentQuestion < questions.length - 1) {
+            questions[currentQuestion].style.display = 'none';
+            currentQuestion++;
+            questions[currentQuestion].style.display = 'block';
+            updateNavigation();
+            updateProgress();
+        }
+    }
+
+    function showPreviousQuestion() {
+        const questions = document.querySelectorAll('.question-card');
+        if (currentQuestion > 0) {
+            questions[currentQuestion].style.display = 'none';
+            currentQuestion--;
+            questions[currentQuestion].style.display = 'block';
+            updateNavigation();
+            updateProgress();
+        }
+    }
+
+    function updateNavigation() {
+        const questions = document.querySelectorAll('.question-card');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Show/hide Previous button
+        prevBtn.style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
+        
+        // Show/hide Next button and Submit button
+        if (currentQuestion === questions.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+        }
+    }
+
+    function updateProgress() {
+        const questions = document.querySelectorAll('.question-card');
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = `${progress}%`;
+        progressBar.textContent = `${Math.round(progress)}%`;
+    }
+
+    // Form validation before submission
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+        const questions = document.querySelectorAll('.question-card');
+        let allAnswered = true;
+        let unansweredQuestions = [];
+
+        questions.forEach((question, index) => {
+            const radios = question.querySelectorAll('input[type="radio"]');
+            const isAnswered = Array.from(radios).some(radio => radio.checked);
+            
+            if (!isAnswered) {
+                allAnswered = false;
+                unansweredQuestions.push(index + 1);
+            }
+        });
+
+        if (!allAnswered) {
+            e.preventDefault();
+            alert(`Please answer all questions before submitting.\nUnanswered questions: ${unansweredQuestions.join(', ')}`);
+            
+            // Show the first unanswered question
+            questions.forEach(q => q.style.display = 'none');
+            questions[unansweredQuestions[0] - 1].style.display = 'block';
+            currentQuestion = unansweredQuestions[0] - 1;
+            updateNavigation();
+            updateProgress();
+        }
+    });
+</script>
+
+<style>
+    .question-card {
+        transition: all 0.3s ease;
+    }
+    
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .progress {
+        height: 10px;
+        border-radius: 5px;
+    }
+    
+    .form-check {
+        padding: 15px;
+        border-radius: 5px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .form-check:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .btn {
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
