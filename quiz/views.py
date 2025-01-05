@@ -2,8 +2,56 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.contrib import messages
 from .models import Quiz, Question, Choice
+from django.contrib.auth.models import User
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from django.contrib.admin.views.decorators import staff_member_required
 
+@staff_member_required
+def custom_admin_dashboard(request):
+    # Get basic statistics
+    total_quizzes = Quiz.objects.count()
+    total_questions = Question.objects.count()
+    total_users = User.objects.count()
+    
+    # Get recent quizzes
+    recent_quizzes = Quiz.objects.all().order_by('-created_at')[:5]
+    
+    # Get most attempted quizzes
+    popular_quizzes = Quiz.objects.annotate(
+        total_attempts=Count('attempts')
+    ).order_by('-total_attempts')[:5]
 
+    # Get quizzes by difficulty
+    difficulty_stats = Quiz.objects.values('difficulty').annotate(
+        count=Count('id')
+    ).order_by('difficulty')
+
+    # Get monthly quiz creation stats
+    monthly_stats = Quiz.objects.annotate(
+        month=TruncMonth('created_at')
+    ).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')
+
+    # Convert monthly stats to chart data
+    chart_data = json.dumps(
+        list(monthly_stats),
+        cls=DjangoJSONEncoder
+    )
+
+    context = {
+        'total_quizzes': total_quizzes,
+        'total_questions': total_questions,
+        'total_users': total_users,
+        'recent_quizzes': recent_quizzes,
+        'popular_quizzes': popular_quizzes,
+        'difficulty_stats': difficulty_stats,
+        'chart_data': chart_data,
+    }
+
+    return render(request, 'admin/dashboard.html', context)
 
 class QuizDetailView(DetailView):
     model = Quiz
