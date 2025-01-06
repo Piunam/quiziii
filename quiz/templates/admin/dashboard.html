@@ -1,0 +1,167 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.css">
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+    .stats-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-item {
+        text-align: center;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+    }
+    .stat-label {
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    .recent-list {
+        list-style: none;
+        padding: 0;
+    }
+    .recent-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Statistics Overview -->
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-number">{{ total_quizzes }}</div>
+            <div class="stat-label">Total Quizzes</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ total_questions }}</div>
+            <div class="stat-label">Total Questions</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Quizzes -->
+        <div class="col-md-6">
+            <div class="stats-card">
+                <h3>Recent Quizzes</h3>
+                <ul class="recent-list">
+                    {% for quiz in recent_quizzes %}
+                    <li class="recent-item">
+                        <strong>{{ quiz.title }}</strong>
+                        <br>
+                        <small>Created: {{ quiz.created_at|date:"M d, Y" }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Popular Quizzes -->
+        <div class="col-md-6">
+            <div class="stats-card">
+                <h3>Most Popular Quizzes</h3>
+                <ul class="recent-list">
+                    {% for quiz in popular_quizzes %}
+                    <li class="recent-item">
+                        <strong>{{ quiz.title }}</strong>
+                        <br>
+                        <small>Attempts: {{ quiz.total_attempts }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="stats-card">
+                <h3>Quiz Creation Trends</h3>
+                <canvas id="quizTrendsChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="stats-card">
+                <h3>Quizzes by Difficulty</h3>
+                <canvas id="difficultyChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.js"></script>
+<script>
+    // Quiz Trends Chart
+    const trendsCtx = document.getElementById('quizTrendsChart').getContext('2d');
+    const chartData = {{ chart_data|safe }};
+    
+    new Chart(trendsCtx, {
+        type: 'line',
+        data: {
+            labels: chartData.map(item => new Date(item.month).toLocaleDateString('default', { month: 'short', year: 'numeric' })),
+            datasets: [{
+                label: 'Quizzes Created',
+                data: chartData.map(item => item.count),
+                borderColor: '#007bff',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Difficulty Distribution Chart
+    const difficultyCtx = document.getElementById('difficultyChart').getContext('2d');
+    const difficultyData = {{ difficulty_stats|safe }};
+    
+    new Chart(difficultyCtx, {
+        type: 'doughnut',
+        data: {
+            labels: difficultyData.map(item => item.difficulty),
+            datasets: [{
+                data: difficultyData.map(item => item.count),
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+{% endblock %}

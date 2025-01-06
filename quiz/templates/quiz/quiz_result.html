@@ -1,0 +1,93 @@
+{% extends 'quiz/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Quiz Results</h2>
+                </div>
+                <div class="card-body">
+                    <!-- Score Display -->
+                    <div class="text-center mb-4">
+                        <div class="display-4 mb-3">Your Score</div>
+                        <div class="score-circle mb-3">
+                            <h1 class="display-1">{{ score }}%</h1>
+                            <p>{{ correct_answers }} out of {{ total_questions }} correct</p>
+                        </div>
+                        {% if score >= 70 %}
+                            <div class="alert alert-success">Congratulations! You passed!</div>
+                        {% else %}
+                            <div class="alert alert-warning">Keep practicing! You can do better!</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Detailed Results -->
+                    <div class="results-detail mb-4">
+                        {% for answer in user_answers %}
+                        <div class="card mb-3">
+                            <div class="card-header {% if answer.is_correct %}bg-success text-white{% else %}bg-danger text-white{% endif %}">
+                                Question {{ forloop.counter }}
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text"><strong>Q: </strong>{{ answer.question_text }}</p>
+                                <p class="card-text"><strong>Your Answer: </strong>{{ answer.user_answer }}</p>
+                                {% if not answer.is_correct %}
+                                    <p class="card-text"><strong>Correct Answer: </strong>{{ answer.correct_answer }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-3">
+                        <a href="{% url 'quiz:quiz_detail' quiz.id %}" class="btn btn-primary btn-lg">
+                            Retake Quiz
+                        </a>
+                        <a href="{% url 'quiz:quiz_list' %}" class="btn btn-secondary btn-lg">
+                            Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .score-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        border: 10px solid 
+            {% if score >= 70 %}#28a745
+            {% else %}#ffc107{% endif %};
+    }
+
+    .results-detail .card {
+        transition: transform 0.2s;
+    }
+
+    .results-detail .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn {
+        transition: all 0.3s;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

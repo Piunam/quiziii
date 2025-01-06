@@ -1,0 +1,74 @@
+{% extends 'quiz/base.html' %}
+{% load static %}
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Available Quizzes</h1>
+            <p class="text-center text-muted">Select a quiz to test your knowledge</p>
+        </div>
+    </div>
+
+    <!-- Quiz Cards Section -->
+    <div class="row">
+        {% if quizzes %}
+            {% for quiz in quizzes %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm hover-shadow">
+                    {% if quiz.image %}
+                        <img src="{{ quiz.image.url }}" class="card-img-top" alt="{{ quiz.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ quiz.title }}</h5>
+                        <p class="card-text">{{ quiz.description }}</p>
+                        <div class="quiz-meta text-muted mb-3">
+                            <small>
+                                <i class="fas fa-clock"></i> Duration: {{ quiz.duration }} minutes
+                                <br>
+                                <i class="fas fa-question-circle"></i> Questions: {{ quiz.question_set.count }}
+                            </small>
+                        </div>
+                        <a href="{% url 'quiz:quiz_detail' quiz.pk %}" 
+                           class="btn btn-primary w-100">
+                            Take Quiz <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <small class="text-muted">
+                            <i class="fas fa-users"></i> {{ quiz.attempts }} attempts
+                            {% if quiz.difficulty %}
+                                • <span class="badge {% if quiz.difficulty == 'Easy' %}bg-success{% elif quiz.difficulty == 'Medium' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ quiz.difficulty }}
+                                </span>
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No quizzes are available at the moment.
+                    <br>
+                    Please check back later!
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add this to your CSS -->
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        transition: transform 0.2s ease-in-out;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+    
+    .card {
+        transition: all 0.2s ease-in-out;
+    }
+</style>
+{% endblock %}
