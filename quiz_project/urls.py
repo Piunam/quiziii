@@ -16,14 +16,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+<<<<<<< HEAD
 from django.conf import settings
 from django.conf.urls.static import static
 from quiz.admin import custom_admin_site  # Ensure this import exists
+=======
+
+
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
 
 app_name = 'quiz'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
     path('quiz-admin/', custom_admin_site.urls),
     path('', include('quiz.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+=======
+    path('grappelli/', include('grappelli.urls')),
+    path('', include('quiz.urls')),
+]
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
+

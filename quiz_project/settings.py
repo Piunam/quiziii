@@ -14,6 +14,7 @@ from pathlib import Path
 import dj_database_url
 
 
+<<<<<<< HEAD
 
 
 
@@ -21,6 +22,11 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+=======
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -38,6 +44,10 @@ ALLOWED_HOSTS = ['your-app-name.herokuapp.com', 'localhost', '127.0.0.1'] #chang
 # Application definition
 
 INSTALLED_APPS = [
+<<<<<<< HEAD
+=======
+    'grappelli',
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -134,11 +144,19 @@ USE_TZ = True
 # STATIC_URL = 'static/'
 STATIC_URL = '/static/'
 
+<<<<<<< HEAD
 STATICFILES_DIRS = [BASE_DIR / 'static']
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+=======
+# STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # changes
 

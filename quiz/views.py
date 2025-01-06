@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, View
 from django.contrib import messages
 from .models import Quiz, Question, Choice
+<<<<<<< HEAD
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
@@ -9,6 +10,13 @@ from django.db.models.functions import TruncMonth
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from django.contrib.auth.models import User
+=======
+from django.contrib.auth.models import User
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
+from django.contrib.admin.views.decorators import staff_member_required
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
 
 @staff_member_required
 def custom_admin_dashboard(request):
@@ -55,7 +63,10 @@ def custom_admin_dashboard(request):
 
     return render(request, 'admin/dashboard.html', context)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4
 class QuizDetailView(DetailView):
     model = Quiz
     template_name = 'quiz/quiz_detail.html'

@@ -1,5 +1,6 @@
 # quiziii
 A dynamic Django-based quiz app for creating, managing, and attempting quizzes. Features include categories, scoring, user stats, real-time results, and a responsive design for educational or fun purposes. and many more features to come..........
+<<<<<<< HEAD
 
 
 difference in admin and custom_admin
@@ -26,3 +27,5 @@ Quiz difficulty distribution
 Custom badges for difficulty levels
 Customized headers and titles
 Special route for dashboard view (/quiz-admin/dashboard/)
+=======
+>>>>>>> 7e79dcb39adf4aace1ca4763daa5ae0b61a6bac4

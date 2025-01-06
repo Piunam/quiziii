@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Welcome to Quiz Admin Portal</h1>
+        <a class="button" href="/admin/quiz/">Manage Quizzes</a>
+        <a class="button" href="/admin/questions/">Manage Questions</a>
+        <a class="button" href="/admin/users/">Manage Users</a>
+    </div>
+</body>
+</html>
+<script>
+    function toggleTheme() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+        document.cookie = `theme=${theme}; path=/`;
+    }
+
+    window.onload = () => {
+        const theme = document.cookie.split('; ').find(row => row.startsWith('theme=')).split('=')[1];
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    };
+</script>
+<button onclick="toggleTheme()">Toggle Theme</button>
+
+<style>
+    body.dark-mode {
+        background-color: #121212;
+        color: #ffffff;
+    }
+    button {
+        margin: 10px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
